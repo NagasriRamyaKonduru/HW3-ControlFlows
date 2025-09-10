@@ -1,0 +1,99 @@
+---
+title: "index.qmd"
+format: html
+editor: visual
+---
+
+## Setup
+
+We load the provided `.rda` file, which contains our list `bp_list` with treatment and placebo data frames.
+
+```{r}
+load("hw2_list.rda")
+
+names(bp_list$treatment)
+names(bp_list$placebo)
+
+```
+
+## Task 1: Control Flow Practice
+
+We add a new column `status` to each data frame and fill it using a for loop + if/else.
+
+```{r}
+# Add empty column to both data frames
+bp_list$treatment$status <- character(nrow(bp_list$treatment))
+bp_list$placebo$status   <- character(nrow(bp_list$placebo))
+
+# Fill treatment data
+for (i in 1:nrow(bp_list$treatment)) {
+  if (bp_list$treatment$post_bp[i] <= 120) {
+    bp_list$treatment$status[i] <- "optimal"
+  } else if (bp_list$treatment$post_bp[i] <= 130) {
+    bp_list$treatment$status[i] <- "borderline"
+  } else {
+    bp_list$treatment$status[i] <- "high"
+  }
+}
+
+# Fill placebo data
+for (i in 1:nrow(bp_list$placebo)) {
+  if (bp_list$placebo$post_bp[i] <= 120) {
+    bp_list$placebo$status[i] <- "optimal"
+  } else if (bp_list$placebo$post_bp[i] <= 130) {
+    bp_list$placebo$status[i] <- "borderline"
+  } else {
+    bp_list$placebo$status[i] <- "high"
+  }
+}
+
+# Check results
+head(bp_list$treatment)
+head(bp_list$placebo)
+
+```
+
+## Task 2: Function Writing
+
+We now write a function that calculates a statistic (default: mean) for `pre`, `post`, and `diff` columns of both treatment and placebo data.
+
+```{r}
+my_summary <- function(df_list, stat = "mean") {
+  my_fun <- get(stat)  # convert string like "mean" into a function
+  
+  # compute for treatment
+  treat_vals <- sapply(df_list$treatment[, c("pre_bp", "post_bp", "diff_bp")], my_fun)
+  
+  # compute for placebo
+  plac_vals  <- sapply(df_list$placebo[, c("pre_bp", "post_bp", "diff_bp")], my_fun)
+  
+  # combine results
+  results <- c(treat_vals, plac_vals)
+  
+  # assign names
+  names(results) <- c(
+    paste0(stat, "_treat_pre"),
+    paste0(stat, "_treat_post"),
+    paste0(stat, "_treat_diff"),
+    paste0(stat, "_plac_pre"),
+    paste0(stat, "_plac_post"),
+    paste0(stat, "_plac_diff")
+  )
+  
+  return(results)
+}
+# Default (mean)
+my_summary(bp_list)
+
+# Variance
+my_summary(bp_list, "var")
+
+# Standard Deviation
+my_summary(bp_list, "sd")
+
+# Minimum
+my_summary(bp_list, "min")
+
+# Maximum
+my_summary(bp_list, "max")
+```

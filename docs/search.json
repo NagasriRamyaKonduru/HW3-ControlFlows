@@ -1,0 +1,30 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "index.qmd",
+    "section": "",
+    "text": "We load the provided .rda file, which contains our list bp_list with treatment and placebo data frames.\n\nload(\"hw2_list.rda\")\n\nnames(bp_list$treatment)\n\n[1] \"patient\" \"pre_bp\"  \"post_bp\" \"diff_bp\" \"normal\" \n\nnames(bp_list$placebo)\n\n[1] \"patient\" \"pre_bp\"  \"post_bp\" \"diff_bp\" \"normal\""
+  },
+  {
+    "objectID": "index.html#setup",
+    "href": "index.html#setup",
+    "title": "index.qmd",
+    "section": "",
+    "text": "We load the provided .rda file, which contains our list bp_list with treatment and placebo data frames.\n\nload(\"hw2_list.rda\")\n\nnames(bp_list$treatment)\n\n[1] \"patient\" \"pre_bp\"  \"post_bp\" \"diff_bp\" \"normal\" \n\nnames(bp_list$placebo)\n\n[1] \"patient\" \"pre_bp\"  \"post_bp\" \"diff_bp\" \"normal\""
+  },
+  {
+    "objectID": "index.html#task-1-control-flow-practice",
+    "href": "index.html#task-1-control-flow-practice",
+    "title": "index.qmd",
+    "section": "Task 1: Control Flow Practice",
+    "text": "Task 1: Control Flow Practice\nWe add a new column status to each data frame and fill it using a for loop + if/else.\n\n# Add empty column to both data frames\nbp_list$treatment$status &lt;- character(nrow(bp_list$treatment))\nbp_list$placebo$status   &lt;- character(nrow(bp_list$placebo))\n\n# Fill treatment data\nfor (i in 1:nrow(bp_list$treatment)) {\n  if (bp_list$treatment$post_bp[i] &lt;= 120) {\n    bp_list$treatment$status[i] &lt;- \"optimal\"\n  } else if (bp_list$treatment$post_bp[i] &lt;= 130) {\n    bp_list$treatment$status[i] &lt;- \"borderline\"\n  } else {\n    bp_list$treatment$status[i] &lt;- \"high\"\n  }\n}\n\n# Fill placebo data\nfor (i in 1:nrow(bp_list$placebo)) {\n  if (bp_list$placebo$post_bp[i] &lt;= 120) {\n    bp_list$placebo$status[i] &lt;- \"optimal\"\n  } else if (bp_list$placebo$post_bp[i] &lt;= 130) {\n    bp_list$placebo$status[i] &lt;- \"borderline\"\n  } else {\n    bp_list$placebo$status[i] &lt;- \"high\"\n  }\n}\n\n# Check results\nhead(bp_list$treatment)\n\n            patient pre_bp post_bp diff_bp normal     status\nSubject_1 Subject_1    120     127      -7  FALSE borderline\nSubject_2 Subject_2    151     145       6  FALSE       high\nSubject_3 Subject_3    125     135     -10  FALSE       high\nSubject_4 Subject_4    126     122       4  FALSE borderline\nSubject_5 Subject_5    115     115       0   TRUE    optimal\nSubject_6 Subject_6    132     122      10  FALSE borderline\n\nhead(bp_list$placebo)\n\n    patient pre_bp post_bp diff_bp normal     status\n1 Subject_1    138     105      33   TRUE    optimal\n2 Subject_2    135     136      -1  FALSE       high\n3 Subject_3    147     123      24  FALSE borderline\n4 Subject_4    117     130     -13  FALSE borderline\n5 Subject_5    152     134      18  FALSE       high\n6 Subject_6    134     143      -9  FALSE       high"
+  },
+  {
+    "objectID": "index.html#task-2-function-writing",
+    "href": "index.html#task-2-function-writing",
+    "title": "index.qmd",
+    "section": "Task 2: Function Writing",
+    "text": "Task 2: Function Writing\nWe now write a function that calculates a statistic (default: mean) for pre, post, and diff columns of both treatment and placebo data.\n\nmy_summary &lt;- function(df_list, stat = \"mean\") {\n  my_fun &lt;- get(stat)  # convert string like \"mean\" into a function\n  \n  # compute for treatment\n  treat_vals &lt;- sapply(df_list$treatment[, c(\"pre_bp\", \"post_bp\", \"diff_bp\")], my_fun)\n  \n  # compute for placebo\n  plac_vals  &lt;- sapply(df_list$placebo[, c(\"pre_bp\", \"post_bp\", \"diff_bp\")], my_fun)\n  \n  # combine results\n  results &lt;- c(treat_vals, plac_vals)\n  \n  # assign names\n  names(results) &lt;- c(\n    paste0(stat, \"_treat_pre\"),\n    paste0(stat, \"_treat_post\"),\n    paste0(stat, \"_treat_diff\"),\n    paste0(stat, \"_plac_pre\"),\n    paste0(stat, \"_plac_post\"),\n    paste0(stat, \"_plac_diff\")\n  )\n  \n  return(results)\n}\n# Default (mean)\nmy_summary(bp_list)\n\n mean_treat_pre mean_treat_post mean_treat_diff   mean_plac_pre  mean_plac_post \n         131.60          125.95            5.65          131.90          128.90 \n mean_plac_diff \n           3.00 \n\n# Variance\nmy_summary(bp_list, \"var\")\n\n var_treat_pre var_treat_post var_treat_diff   var_plac_pre  var_plac_post \n      75.72632       78.99737      117.81842      149.87778      124.98889 \n var_plac_diff \n     341.33333 \n\n# Standard Deviation\nmy_summary(bp_list, \"sd\")\n\n sd_treat_pre sd_treat_post sd_treat_diff   sd_plac_pre  sd_plac_post \n     8.702087      8.888046     10.854419     12.242458     11.179843 \n sd_plac_diff \n    18.475209 \n\n# Minimum\nmy_summary(bp_list, \"min\")\n\n min_treat_pre min_treat_post min_treat_diff   min_plac_pre  min_plac_post \n           115            114            -24            114            105 \n min_plac_diff \n           -21 \n\n# Maximum\nmy_summary(bp_list, \"max\")\n\n max_treat_pre max_treat_post max_treat_diff   max_plac_pre  max_plac_post \n           151            146             21            152            143 \n max_plac_diff \n            33"
+  }
+]
